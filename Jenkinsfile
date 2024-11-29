@@ -1,7 +1,7 @@
 node {
 	def app
 	stage('Clone repository') {
-		git 'https://github.com/kang-dain/open_J00.git'
+		git url: 'https://github.com/kang-dain/open_J00.git', credentialsId: 'github-credentials'
 
 	}
 	stage('Build image') {
