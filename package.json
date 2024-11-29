@@ -17,5 +17,8 @@
     "node-cron": "^3.0.3",
     "node-schedule": "^2.1.1",
     "uuid": "^9.0.1"
+  },
+  "scripts": {
+  "test": "ehco \"No tests defined yet\" && exit 0"
   }
 }
