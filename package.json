@@ -19,6 +19,6 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-  "test": "ehco \"No tests defined yet\" && exit 0"
+  "test": "echo \"No tests defined yet\" && exit 0"
   }
 }
