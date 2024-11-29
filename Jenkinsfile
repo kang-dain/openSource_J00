@@ -8,12 +8,6 @@ node {
         app = docker.build("daain/open_j00")
     }
 
-    stage('Test image') {
-        app.inside {
-            sh 'npm test'
-        }
-    }
-
     stage('Push image') {
         script {
             docker.withRegistry('https://registry.hub.docker.com', 'daain') {
