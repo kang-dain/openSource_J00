@@ -5,7 +5,7 @@ node {
     }
 
     stage('Build image') {
-        app = docker.build("daain/test")
+        app = docker.build("daain/open_j00")
     }
 
     stage('Test image') {
