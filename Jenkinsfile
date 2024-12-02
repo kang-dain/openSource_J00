@@ -10,7 +10,7 @@ node {
 
     stage('Push image') {
         script {
-            docker.withRegistry('https://registry.hub.docker.com', 'daain') {
+            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                 app.push("${env.BUILD_NUMBER}")
                 app.push("latest")
             }
