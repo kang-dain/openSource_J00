@@ -1,7 +1,11 @@
 node {
     def app
     stage('Clone repository') {
-        git url: 'https://github.com/kang-dain/open_J00.git', branch: 'master'
+        // GitHub Personal Access Token을 사용하는 자격 증명 지정
+        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
+            // GitHub 인증을 사용하여 리포지토리 클론
+            git url: 'https://github.com/kang-dain/open_J00.git', branch: 'master', credentialsId: 'github-token'
+        }
     }
 
     stage('Build image') {
@@ -10,7 +14,8 @@ node {
 
     stage('Push image') {
         script {
-            docker.withRegistry('https://registry.hub.docker.com', 'daain') {
+            // Docker Hub에 로그인
+            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
                 app.push("${env.BUILD_NUMBER}")
                 app.push("latest")
             }
