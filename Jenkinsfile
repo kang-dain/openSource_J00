@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Docker 이미지 빌드
-                    app = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                    app = docker.build("daain/open_j00:${env.BUILD_ID}")
                 }
             }
         }

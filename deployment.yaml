@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: openj00-container
-          image: daain/openj00:latest 
+          image: daain/open_j00:latest 
           ports:
             - containerPort: 3000
           env:
@@ -27,11 +27,11 @@ spec:
               mountPath: /app/uploads
           resources:
             limits:
-              memory: "128Mi"
-              cpu: "200m"
-            requests:
               memory: "64Mi"
               cpu: "100m"
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
       volumes:
         - name: uploads-volume
           emptyDir: {}
