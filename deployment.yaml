@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openj00-deployment
+  labels:
+    app: openj00
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: openj00
+  template:
+    metadata:
+      labels:
+        app: openj00
+    spec:
+      containers:
+        - name: openj00-container
+          image: daain/openj00:latest 
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+          volumeMounts:
+            - name: uploads-volume
+              mountPath: /app/uploads
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+      volumes:
+        - name: uploads-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openj00-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001 # Optional: Kubernetes assigns a port automatically if omitted
+  selector:
+    app: openj00
