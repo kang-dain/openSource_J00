@@ -12,9 +12,15 @@ pipeline {
     stages {
         stage("Checkout code") {
             steps {
-                // GitHub에서 소스 코드 클론
-                withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDENTIALS}", usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-                    git url: 'https://github.com/kang-dain/open_J00.git', branch: 'master', credentialsId: "${GITHUB_CREDENTIALS}"
+                script {
+                    // GitHub에서 소스 코드 클론
+                    checkout([$class: 'GitSCM',
+                        branches: [[name: '*/master']],
+                        userRemoteConfigs: [[
+                            url: 'https://github.com/kang-dain/open_J00.git',
+                            credentialsId: "${GITHUB_CREDENTIALS}"
+                        ]]
+                    ])
                 }
             }
         }
@@ -60,6 +66,17 @@ pipeline {
                     """
                 }
             }
+        }
+    }
+    post {
+        always {
+            echo "Pipeline completed"
+        }
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed."
         }
     }
 }
