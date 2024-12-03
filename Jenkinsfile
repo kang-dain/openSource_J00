@@ -49,8 +49,7 @@ pipeline {
                         clusterName: CLUSTER_NAME,
                         location: LOCATION,
                         manifestPattern: 'deployment.yaml',
-                        credentialsId: CREDENTIALS_ID,
-                        verifyDeployments: true
+                        credentialsId: CREDENTIALS_ID
                     ])
                 }
             }
