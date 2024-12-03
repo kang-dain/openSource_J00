@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Docker Hub에 이미지 푸시
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
+                    docker.withRegistry('https://registry.hub.docker.com', 'daain') {
                         app.push("latest")
                         app.push("${env.BUILD_ID}")
                     }
