@@ -27,10 +27,10 @@ spec:
               mountPath: /app/uploads
           resources:
             limits:
-              memory: "64Mi"
+              memory: "128Mi"
               cpu: "100m"
             requests:
-              memory: "32Mi"
+              memory: "64Mi"
               cpu: "50m"
       volumes:
         - name: uploads-volume

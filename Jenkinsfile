@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                     // deployment.yaml 파일 수정
-                    sh "sed -i 's|open_j00:latest|${DOCKER_IMAGE}:${env.BUILD_ID}|g' deployment.yaml"
+                    sh "sed -i 's|image: daain/open_j00:latest|image: ${DOCKER_IMAGE}:${env.BUILD_ID}|' deployment.yaml"
                     
                     // GKE 클러스터에 배포
                     step([
