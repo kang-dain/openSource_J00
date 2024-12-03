@@ -1,48 +1,70 @@
-node {
-    def app
-
-    stage('Clone repository') {
-        // GitHub Personal Access Token을 사용하는 자격 증명 지정
-        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_TOKEN')]) {
-            // GitHub 인증을 사용하여 리포지토리 클론
-            git url: 'https://github.com/kang-dain/open_J00.git', branch: 'master', credentialsId: 'github-token'
+pipeline {
+    agent any
+    environment {
+        PROJECT_ID = 'spheric-method-442206-d2'
+        CLUSTER_NAME = 'kube'
+        LOCATION = 'asia-northeast3-a'
+        CREDENTIALS_ID = 'gke'
+        DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
+        DOCKER_IMAGE = 'daain/open_j00'
+    }
+    stages {
+        stage("Checkout code") {
+            steps {
+                checkout scm
+            }
         }
-    }
-
-    stage('Build image') {
-        // Docker 이미지 빌드
-        app = docker.build("daain/open_j00")
-    }
-
-    stage('Push image') {
-        script {
-            // Docker Hub에 로그인
-            docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
-                app.push("${env.BUILD_NUMBER}")
-                app.push("latest")
+        stage("Build image") {
+            steps {
+                script {
+                    // Docker 이미지 빌드
+                    app = docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                }
+            }
+        }
+        stage("Push image") {
+            steps {
+                script {
+                    // Docker Hub에 이미지 푸시
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
+                        app.push("latest")
+                        app.push("${env.BUILD_ID}")
+                    }
+                }
+            }
+        }
+        stage('Deploy to GKE') {
+            when {
+                branch 'master'
+            }
+            steps {
+                script {
+                    // deployment.yaml 파일 수정
+                    sh "sed -i 's/open_j00:latest/${DOCKER_IMAGE}:${env.BUILD_ID}/g' deployment.yaml"
+                    
+                    // GKE 클러스터에 배포
+                    step([
+                        $class: 'KubernetesEngineBuilder',
+                        projectId: PROJECT_ID,
+                        clusterName: CLUSTER_NAME,
+                        location: LOCATION,
+                        manifestPattern: 'deployment.yaml',
+                        credentialsId: CREDENTIALS_ID,
+                        verifyDeployments: true
+                    ])
+                }
             }
         }
     }
-
-    stage('Authenticate with GKE') {
-        script {
-            // GKE 인증 및 클러스터 설정
-            withCredentials([file(credentialsId: 'gke', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                sh """
-                    gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
-                    gcloud container clusters get-credentials kube --zone asia-northeast3-a --project spheric-method-442206-d2
-                """
-            }
+    post {
+        always {
+            echo 'Pipeline completed.'
         }
-    }
-
-    stage('Deploy to Kubernetes') {
-        script {
-            // Kubernetes에 배포
-            sh """
-                kubectl apply -f deployment.yaml
-                kubectl rollout status deployment/openj00-deployment
-            """
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed.'
         }
     }
 }
