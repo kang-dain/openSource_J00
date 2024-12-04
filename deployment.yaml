@@ -7,7 +7,10 @@ metadata:
 spec:
   replicas: 3
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: open_j00
@@ -19,7 +22,7 @@ spec:
     spec:
       containers:
         - name: open_j00
-          image: daain/open_j00:latest
+          image: daain/open_j00:${BUILD_ID}
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
