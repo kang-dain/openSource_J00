@@ -23,19 +23,26 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'daain') {
-                            app.push("latest")
-                            app.push("${env.BUILD_ID}")
+                        app.push("latest")
+                        app.push("${env.BUILD_ID}")
                     }
                 }
             }
-        }        
+        }
         stage('Deploy to GKE') {
             when {
                 branch 'master'
             }
             steps {
                 sh "sed -i 's/open_j00:latest/open_j00:${env.BUILD_ID}/g' deployment.yaml"
-                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                step([
+                    $class: 'KubernetesEngineBuilder',
+                    projectId: env.PROJECT_ID,
+                    clusterName: env.CLUSTER_NAME,
+                    location: env.LOCATION,
+                    manifestPattern: 'deployment.yaml',
+                    credentialsId: env.CREDENTIALS_ID
+                ])
             }
         }
     }    
