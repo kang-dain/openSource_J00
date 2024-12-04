@@ -1,41 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: open_j00
+  name: openj00-deployment
   labels:
-    app: open_j00
+    app: openj00
 spec:
   replicas: 3
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
-      app: open_j00
+      app: openj00
   template:
     metadata:
       labels:
-        app: open_j00
-        tier: open_j00
+        app: openj00
     spec:
       containers:
-        - name: open_j00
+        - name: openj00-container
           image: daain/open_j00:latest
-          imagePullPolicy: Always
+          imagePullPolicy: Always 
           ports:
             - containerPort: 3000
-              name: open_j00
+          env:
+            - name: NODE_ENV
+              value: "production"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: open_j00
-  labels:
-    app: open_j00
+  name: openj00-service
 spec:
+  type: NodePort
   ports:
-    - port: 80
+    - port: 3000
       targetPort: 3000
+      nodePort: 30001 # Optional: Kubernetes assigns a port automatically if omitted
   selector:
-    app: open_j00
-    tier: open_j00
-  type: LoadBalancer
+    app: openj00
